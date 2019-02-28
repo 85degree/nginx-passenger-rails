@@ -50,6 +50,17 @@ RUN apt-get install -y libnginx-mod-http-passenger
 
 RUN if [ ! -f /etc/nginx/modules-enabled/50-mod-http-passenger.conf ]; then ln -s /usr/share/nginx/modules-available/mod-http-passenger.load /etc/nginx/modules-enabled/50-mod-http-passenger.conf ; fi
 
+# gosu
+RUN set -eux; \
+	apt-get update; \
+	apt-get install -y gosu; \
+	rm -rf /var/lib/apt/lists/*; \
+# verify that the binary works
+	gosu nobody true
+
 # restart nginx
-RUN service nginx restart
 EXPOSE 80
+
+COPY ./entrypoint.sh /
+RUN ["chmod", "+x", "/entrypoint.sh"]
+ENTRYPOINT [ "/entrypoint.sh" ]
